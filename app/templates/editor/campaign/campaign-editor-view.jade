@@ -1,0 +1,81 @@
+extends /templates/base
+
+block header
+  if campaign.loading
+    nav.navbar.navbar-default(role='navigation')#campaign-editor-top-nav
+      .container-fluid
+        ul.nav.navbar-nav
+          li
+            a(href="/")
+              span.glyphicon-home.glyphicon
+  else
+    nav.navbar.navbar-default(role='navigation')#campaign-editor-top-nav
+      ul.nav.navbar-nav
+        li
+          a(href="/")
+            span.glyphicon-home.glyphicon
+
+      ul.nav.navbar-nav.navbar-right
+        if me.isAdmin()
+          li#save-button
+            a
+              span.glyphicon-floppy-disk.glyphicon
+        li.dropdown
+          a(data-toggle='dropdown')
+            span.glyphicon-chevron-down.glyphicon
+          ul.dropdown-menu
+            li.dropdown-header Actions
+            li(class=anonymous ? "disabled": "")
+              a(data-toggle="coco-modal", data-target="modal/RevertModal", data-i18n="editor.revert")#revert-button Revert
+            li(class=anonymous ? "disabled": "")
+              a(data-i18n="editor.pop_i18n")#pop-level-i18n-button Populate i18n
+            li.divider
+            li.dropdown-header Info
+
+block outer_content
+  .outer-content
+    #left-column
+      #campaign-treema
+
+    #right-column
+      #campaign-view
+      #campaign-level-view.hidden
+      if campaignDropOffs
+        button.btn.btn-default#analytics-button(title="Analytics",  data-toggle="modal" data-target="#analytics-modal") Analytics
+        .modal.fade#analytics-modal(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true")
+          .modal-dialog
+            .modal-content
+              .modal-header
+                button.close(type="button", data-dismiss="modal", aria-label="Close")
+                  span(aria-hidden="true") &times;
+                h4.modal-title Analytics
+              .modal-body
+                if campaignDropOffs.startDay
+                  if campaignDropOffs.endDay
+                    div #{campaignDropOffs.startDay} to #{campaignDropOffs.endDay}
+                  else
+                    div #{campaignDropOffs.startDay} to today
+                table.table.table-bordered.table-condensed.table-hover(style='font-size:10pt')
+                  thead
+                    tr
+                      td Level
+                      td Started
+                      td Dropped
+                      td Drop %
+                      td Finished
+                      td Dropped
+                      td Drop %
+                  tbody
+                    - for (var i = 0; i < campaignDropOffs.levels.length; i++)
+                      tr
+                        td= campaignDropOffs.levels[i].level
+                        td= campaignDropOffs.levels[i].started
+                        td= campaignDropOffs.levels[i].startDropped
+                        td= campaignDropOffs.levels[i].startDropRate
+                        td= campaignDropOffs.levels[i].finished
+                        td= campaignDropOffs.levels[i].finishDropped
+                        td= campaignDropOffs.levels[i].finishDropRate
+      else
+        button.btn.btn-default.disabled#analytics-button Analytics Loading...
+
+block footer
